@@ -16,15 +16,17 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-
+use sgx_tstd as std;
+use std::format;
 use std::str::FromStr;
-
+use std::string::ToString;
 use super::big;
 use super::big::Big;
 use super::dbig::DBig;
 use super::rom;
 use crate::arch::{self, Chunk};
 use crate::types::ModType;
+use std::string::String;
 
 #[derive(Clone)]
 pub struct FP {

@@ -16,10 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-
+use sgx_tstd as std;
+use std::format;
 use super::dbig::DBig;
 use crate::arch::{self, Chunk, DChunk};
 use crate::rand::RAND;
+use std::string::String;
+
 
 use std::cmp::Ordering;
 use std::fmt;
@@ -1178,133 +1181,5 @@ impl Big {
             s = Big::modsqr(&s, m);
         }
         a
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_zero() {
-        let zero = Big::new_int(0);
-        assert!(zero.is_zilch());
-
-        let zero2 = Big::new();
-        assert!(zero2.is_zilch());
-        assert_eq!(zero, zero2);
-
-        let zero2 = Big::new_ints(&[0; NLEN]);
-        assert!(zero2.is_zilch());
-
-        let mut zero2 = Big::new_int(123456789);
-        zero2.zero();
-        assert!(zero2.is_zilch());
-
-        let mut zero2 = Big::new_int(9876543210);
-        let zero_dbig = DBig::new();
-        zero2.dcopy(&zero_dbig);
-        assert!(zero2.is_zilch());
-    }
-
-    #[test]
-    fn test_one() {
-        let one = Big::new_int(1);
-        assert!(one.is_unity());
-
-        let mut one2 = Big::new();
-        one2.one();
-        assert!(one2.is_unity());
-    }
-
-    #[test]
-    fn test_add_int() {
-        // 9999 + 77 = 10076
-        let a = Big::new_int(9999);
-        let mut b = Big::new_int(77);
-        let mut c = a.clone();
-        c.add(&b);
-        assert_eq!(c, Big::new_int(10076));
-
-        // 77 + 9999 = 10076
-        b.add(&a);
-        assert_eq!(b, Big::new_int(10076));
-
-        // -1000 + 1000 = 0
-        let mut negatives = Big::new_int(-1000);
-        let positives = Big::new_int(1000);
-        negatives.add(&positives);
-        assert!(negatives.is_zilch());
-    }
-
-    #[test]
-    fn test_sub_int() {
-        // 1 - 1 = 0
-        let one = Big::new_int(1);
-        let mut zero = one.clone();
-        zero.sub(&one);
-        assert!(zero.is_zilch());
-
-        // -3 - 1 =  -4
-        let mut minus_4 = Big::new_int(-3);
-        minus_4.sub(&one);
-        assert_eq!(minus_4, Big::new_int(-4));
-
-        // -10 - (-23) = 13
-        let mut thirteen = Big::new_int(-10);
-        let minus_23 = Big::new_int(-23);
-        thirteen.sub(&minus_23);
-        assert_eq!(thirteen, Big::new_int(13));
-
-        // 1000 - 333 = 777
-        let mut sevens = Big::new_int(1000);
-        let twos = Big::new_int(223);
-        sevens.sub(&twos);
-        assert_eq!(sevens, Big::new_int(777));
-    }
-
-    #[test]
-    fn test_get_set() {
-        let mut big = Big::new();
-
-        for i in 0..NLEN {
-            assert_eq!(big.get(i), 0);
-
-            let a: Chunk = (i + 1) as Chunk;
-            big.set(i, a);
-            assert_eq!(big.get(i), a);
-        }
-    }
-
-    #[test]
-    fn test_xor_top() {
-        let mut big = Big::new();
-        let a = 0b1100_0011;
-        big.set(NLEN - 1, a);
-
-        let b = 0b1001_1001;
-        big.xor_top(b);
-
-        assert_eq!(big.get(NLEN - 1), a ^ b);
-    }
-
-    #[test]
-    fn test_dcopy() {
-        // Create DBig with words 0, 1, 2, ...
-        let mut dbig = DBig::new();
-        for (i, a) in dbig.w.iter_mut().enumerate() {
-            *a = i as Chunk;
-        }
-
-        let mut big = Big::new();
-        big.dcopy(&dbig);
-        for i in 0..NLEN {
-            assert_eq!(big.get(i), i as Chunk);
-        }
-
-        let big2 = Big::new_dcopy(&dbig);
-        for i in 0..NLEN {
-            assert_eq!(big2.get(i), i as Chunk);
-        }
     }
 }

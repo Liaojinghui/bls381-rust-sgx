@@ -16,7 +16,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+use sgx_tstd as std;
 
+use std::vec::Vec;
+use std::vec;
 const HASH256_H0: u32 = 0x6A09_E667;
 const HASH256_H1: u32 = 0xBB67_AE85;
 const HASH256_H2: u32 = 0x3C6E_F372;
@@ -284,153 +287,5 @@ impl HASH256 {
         // Reduce length to size L
         okm.resize(l as usize, 0);
         okm
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_hmac_simple() {
-        let text = [0x0a];
-        let key = [0x0b];
-        let expected =
-            hex::decode("b1746117c186405d121d52866f48270fdeb2177d67f6922f0a031e0101658624")
-                .unwrap();
-
-        let output = HASH256::hmac(&key, &text);
-        assert_eq!(expected, output);
-    }
-
-    #[test]
-    fn test_hmac_empty() {
-        let text = [];
-        let key = [];
-        let expected =
-            hex::decode("b613679a0814d9ec772f95d778c35fc5ff1697c493715653c6c712144292c5ad")
-                .unwrap();
-
-        let output = HASH256::hmac(&key, &text);
-        assert_eq!(expected, output);
-    }
-
-    #[test]
-    fn test_hmac_32_byte_key() {
-        let text = [0x0a];
-        let key = hex::decode("abababababababababababababababababababababababababababababababab")
-            .unwrap();
-        let expected =
-            hex::decode("43997a72e7b3b1c19e5566c940d5f2961c96802b58a3da2acd19dcc1a90a8d05")
-                .unwrap();
-
-        let output = HASH256::hmac(&key, &text);
-        assert_eq!(expected, output);
-    }
-
-    #[test]
-    fn test_hmac_64_byte_key() {
-        let text = [0x0a];
-        let key = hex::decode("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b").unwrap();
-        let expected =
-            hex::decode("93a88773df742079e3512f3d10f4f8ac674e24c4eda78df46c2376dd3946750b")
-                .unwrap();
-
-        let output = HASH256::hmac(&key, &text);
-        assert_eq!(expected, output);
-    }
-
-    #[test]
-    fn test_hmac_65_byte_key() {
-        let text = [0x0a];
-        let key = hex::decode("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0B").unwrap();
-        let expected =
-            hex::decode("7c8dd5068bcff3347dd13a7493247444635b51cf000b18f37a74a55cec3413fb")
-                .unwrap();
-
-        let output = HASH256::hmac(&key, &text);
-        assert_eq!(expected, output);
-    }
-
-    #[test]
-    fn test_hmac_65_byte_text() {
-        let text = hex::decode("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0B").unwrap();
-        let key = [0x0b];
-        let expected =
-            hex::decode("f04344808f2fcdafe1c20272a29b1ce4be00c916a2c14700b82b81c6eae9dd96")
-                .unwrap();
-
-        let output = HASH256::hmac(&key, &text);
-        assert_eq!(expected, output);
-    }
-
-    #[test]
-    fn test_hkdf_case_1() {
-        // From https://tools.ietf.org/html/rfc5869
-        let ikm = hex::decode("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b").unwrap();
-        let salt = hex::decode("000102030405060708090a0b0c").unwrap();
-        let expected_prk =
-            hex::decode("077709362c2e32df0ddc3f0dc47bba6390b6c73bb50f9c3122ec844ad7c2b3e5")
-                .unwrap();
-
-        let output_prk = HASH256::hkdf_extract(&salt, &ikm).to_vec();
-        assert_eq!(expected_prk, output_prk);
-
-        let info = hex::decode("f0f1f2f3f4f5f6f7f8f9").unwrap();
-        let l = 42;
-        let expected_okm = hex::decode(
-            "3cb25f25faacd57a90434f64d0362f2a2d2d0a90cf1a5a4c5db02d56ecc4c5bf34007208d5b887185865",
-        )
-        .unwrap();
-
-        let output_okm = HASH256::hkdf_extend(&expected_prk, &info, l);
-        assert_eq!(expected_okm, output_okm);
-    }
-
-    #[test]
-    fn test_hkdf_case_2() {
-        // From https://tools.ietf.org/html/rfc5869
-        let ikm = hex::decode("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f")
-            .unwrap();
-        let salt = hex::decode("606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
-            .unwrap();
-        let expected_prk =
-            hex::decode("06a6b88c5853361a06104c9ceb35b45cef760014904671014a193f40c15fc244")
-                .unwrap();
-
-        let output_prk = HASH256::hkdf_extract(&salt, &ikm).to_vec();
-        assert_eq!(expected_prk, output_prk);
-
-        let info = hex::decode("b0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff")
-            .unwrap();
-        let l = 82;
-        let expected_okm = hex::decode("b11e398dc80327a1c8e7f78c596a49344f012eda2d4efad8a050cc4c19afa97c59045a99cac7827271cb41c65e590e09da3275600c2f09b8367793a9aca3db71cc30c58179ec3e87c14c01d5c1f3434f1d87")
-            .unwrap();
-
-        let output_okm = HASH256::hkdf_extend(&expected_prk, &info, l);
-        assert_eq!(expected_okm, output_okm);
-    }
-
-    #[test]
-    fn test_hkdf_case_3() {
-        // From https://tools.ietf.org/html/rfc5869
-        let ikm = hex::decode("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b").unwrap();
-        let salt = vec![];
-        let expected_prk =
-            hex::decode("19ef24a32c717b167f33a91d6f648bdf96596776afdb6377ac434c1c293ccb04")
-                .unwrap();
-
-        let output_prk = HASH256::hkdf_extract(&salt, &ikm).to_vec();
-        assert_eq!(expected_prk, output_prk);
-
-        let info = vec![];
-        let l = 42;
-        let expected_okm = hex::decode(
-            "8da4e775a563c18f715f802a063c5a31b8a11f5c5ee1879ec3454e5f3c738d2d9d201395faa4b61a96c8",
-        )
-        .unwrap();
-
-        let output_okm = HASH256::hkdf_extend(&expected_prk, &info, l);
-        assert_eq!(expected_okm, output_okm);
     }
 }

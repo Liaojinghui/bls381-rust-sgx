@@ -16,6 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+use sgx_tstd as std;
 
 use super::big;
 use super::big::Big;
@@ -89,42 +90,4 @@ pub fn verify(sig: &[u8], m: &str, w: &[u8]) -> isize {
         return BLS_OK;
     }
     BLS_FAIL
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::test_utils::*;
-
-    #[test]
-    fn test_bls48() {
-        let mut rng = create_rng();
-
-        let mut s: [u8; BGS] = [0; BGS];
-
-        const G1S: usize = BFS + 1; // Group 1 Size
-        const G2S: usize = 16 * BFS; // Group 2 Size
-
-        let mut w: [u8; G2S] = [0; G2S];
-        let mut sig: [u8; G1S] = [0; G1S];
-
-        let m = String::from("This is a test message");
-
-        key_pair_generate(&mut rng, &mut s, &mut w);
-        print!("Private key : 0x");
-        printbinary(&s);
-        print!("Public  key : 0x");
-        printbinary(&w);
-
-        sign(&mut sig, &m, &s);
-        print!("Signature : 0x");
-        printbinary(&sig);
-
-        let res = verify(&sig, &m, &w);
-        if res == 0 {
-            println!("Signature is OK");
-        } else {
-            println!("Signature is *NOT* OK");
-        }
-    }
 }

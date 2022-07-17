@@ -16,6 +16,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+use sgx_tstd as std;
+
+#[cfg(not(feature = "sgx"))]
+use std;
 
 use super::big::Big;
 use super::dbig::DBig;
@@ -29,6 +33,8 @@ use crate::errors::AmclError;
 use crate::hash256::{BLOCK_SIZE as SHA256_BLOCK_SIZE, HASH256, HASH_BYTES as SHA256_HASH_BYTES};
 use crate::hash384::{BLOCK_SIZE as SHA384_BLOCK_SIZE, HASH384, HASH_BYTES as SHA384_HASH_BYTES};
 use crate::hash512::{BLOCK_SIZE as SHA512_BLOCK_SIZE, HASH512, HASH_BYTES as SHA512_HASH_BYTES};
+use std::vec::Vec;
+use std::vec;
 
 /// Oversized DST padding
 pub const OVERSIZED_DST: &[u8] = b"H2C-OVERSIZE-DST-";

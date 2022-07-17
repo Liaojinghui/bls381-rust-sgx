@@ -16,6 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+use sgx_tstd as std;
 
 pub const HASH224: usize = 28;
 pub const HASH256: usize = 32;

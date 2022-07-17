@@ -16,6 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+use sgx_tstd as std;
 
 use super::big::Big;
 use super::dbig::DBig;
@@ -29,6 +30,9 @@ use super::fp2::FP2;
 use super::fp4::FP4;
 use super::rom;
 use crate::types::{CurvePairingType, SexticTwist, SignOfX};
+
+use std::vec::Vec;
+
 
 #[allow(non_snake_case)]
 #[inline(always)]

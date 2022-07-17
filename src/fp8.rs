@@ -16,11 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+use sgx_tstd as std;
 
 use super::big::Big;
 use super::fp::FP;
 use super::fp2::FP2;
 use super::fp4::FP4;
+use std::string::String;
 
 #[derive(Clone)]
 pub struct FP8 {

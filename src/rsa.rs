@@ -16,6 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+use sgx_tstd as std;
 
 use super::big;
 use super::ff;
@@ -466,48 +467,4 @@ pub fn decrypt(prv: &RsaPrivateKey, g: &[u8], f: &mut [u8]) {
     r.norm();
 
     r.to_bytes(f);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::test_utils::*;
-
-    #[test]
-    fn test_rsa() {
-        let mut rng = create_rng();
-
-        let sha = super::HASH_TYPE;
-        let message: &[u8] = b"Hello World\n";
-        const RFS: usize = super::RFS;
-
-        let mut pbc = super::new_public_key(ff::FFLEN);
-        let mut prv = super::new_private_key(ff::HFLEN);
-
-        let mut ml: [u8; RFS] = [0; RFS];
-        let mut ms: [u8; RFS] = [0; RFS];
-        let mut c: [u8; RFS] = [0; RFS];
-        let mut s: [u8; RFS] = [0; RFS];
-        let mut e: [u8; RFS] = [0; RFS];
-
-        key_pair(&mut rng, 65537, &mut prv, &mut pbc);
-        oaep_encode(sha, &message, &mut rng, None, &mut e); /* OAEP encode message M to E  */
-        encrypt(&pbc, &e, &mut c); /* encrypt encoded message */
-
-        decrypt(&prv, &c, &mut ml);
-        oaep_decode(sha, None, &mut ml); /* OAEP decode message  */
-
-        pkcs15(sha, message, &mut c);
-
-        decrypt(&prv, &c, &mut s); /* create signature in S */
-
-        encrypt(&pbc, &s, &mut ms);
-
-        assert_eq!(c.len(), ms.len());
-        for j in 0..c.len() {
-            assert_eq!(c[j], ms[j])
-        }
-
-        private_key_kill(&mut prv);
-    }
 }

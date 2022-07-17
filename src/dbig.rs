@@ -16,11 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-
+use sgx_tstd as std;
+use std::format;
 use super::big;
 use super::big::{Big, MODBYTES};
 use crate::arch;
 use crate::arch::Chunk;
+use std::string::String;
 
 #[derive(Clone)]
 pub struct DBig {

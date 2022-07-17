@@ -16,6 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+use sgx_tstd as std;
 
 const GCM_NB: usize = 4;
 const GCM_ACCEPTING_HEADER: usize = 0;

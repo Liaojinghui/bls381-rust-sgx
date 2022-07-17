@@ -16,6 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+use sgx_tstd as std;
 
 use super::big;
 use super::big::Big;
@@ -24,7 +25,7 @@ use super::fp2::FP2;
 use super::fp4::FP4;
 use super::rom;
 use crate::types::{SexticTwist, SignOfX};
-
+use std::string::String;
 #[derive(Clone)]
 pub struct ECP4 {
     x: FP4,

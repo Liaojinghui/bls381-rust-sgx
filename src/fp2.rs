@@ -16,9 +16,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-
+use sgx_tstd as std;
+use std::format;
 use std::fmt;
 use std::str::SplitWhitespace;
+use std::string::String;
 
 use super::big::Big;
 use super::dbig::DBig;

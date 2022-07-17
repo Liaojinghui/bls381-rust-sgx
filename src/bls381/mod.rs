@@ -21,6 +21,9 @@ under the License.
 ///
 /// An implementation of BLS12-381 as specified by the following standard:
 /// https://github.com/cfrg/draft-irtf-cfrg-bls-signature
+///
+#[no_std]
+
 pub mod basic;
 pub mod message_augmentation;
 pub mod proof_of_possession;

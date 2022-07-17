@@ -17,9 +17,12 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use sgx_tstd as std;
+
 use super::core;
 use crate::errors::AmclError;
 use crate::rand::RAND;
+use std::vec::Vec;
 
 // Re-export constants from core.
 pub use super::core::{G1_BYTES, G2_BYTES, SECRET_KEY_BYTES};

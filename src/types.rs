@@ -1,3 +1,5 @@
+
+
 #[derive(PartialEq)]
 pub enum ModType {
     NotSpecial,
